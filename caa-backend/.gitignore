@@ -1,0 +1,11 @@
+# Entorno virtual de Python
+venv/
+__pycache__/
+
+# Base de datos local (SQLite)
+*.db
+*.sqlite3
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
