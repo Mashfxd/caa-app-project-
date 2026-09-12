@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import models
 from database import engine, get_db
@@ -9,6 +10,14 @@ app = FastAPI(
     title="CAA App API",
     description="Backend MVP para Sistema de Comunicación Aumentativa",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 @app.get("/")
