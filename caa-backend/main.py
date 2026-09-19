@@ -12,12 +12,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Configuración de CORS para permitir conexión con Flutter
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 @app.get("/")
@@ -26,28 +27,25 @@ def read_root():
 
 @app.get("/users/{user_id}/board")
 def get_user_board(user_id: int, db: Session = Depends(get_db)):
-    # Verificamos si el usuario existe
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    # Consultamos los elementos del tablero haciendo un JOIN con los pictogramas
     board_items = db.query(models.BoardItem).filter(models.BoardItem.user_id == user_id).all()
-    
-    if not board_items:
-        return {"message": "No se encontraron elementos del tablero para el usuario especificado."}
 
-    # Armamos una respuesta limpia y directa para Flutter
-    response_data = []
+    items_list = []
     for item in board_items:
-        response_data.append({
+        pic = item.pictogram
+        items_list.append({
+            "id": pic.id,
+            "palabra": pic.palabra,
+            "parte_de_la_palabra": pic.parte_de_la_palabra,
+            "is_core": pic.is_core,
+            "image_url": pic.image_url,
+            "category_id": pic.category_id,
             "position_x": item.position_x,
             "position_y": item.position_y,
-            "is_hidden": item.is_hidden,
-            "palabra": item.pictogram.palabra,
-            "parte_de_la_palabra": item.pictogram.parte_de_la_palabra,
-            "is_core": item.pictogram.is_core,
-            "image_url": item.pictogram.image_url
+            "is_hidden": item.is_hidden
         })
 
     return {
@@ -55,5 +53,25 @@ def get_user_board(user_id: int, db: Session = Depends(get_db)):
         "nombre": user.nombre,
         "grid_rows": user.grid_rows,
         "grid_cols": user.grid_cols,
-        "board": response_data
+        "board": items_list
+    }
+
+@app.get("/categories/{category_id}/pictograms")
+def get_category_pictograms(category_id: int, db: Session = Depends(get_db)):
+    category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    
+    return {
+        "category_id": category.id,
+        "nombre": category.nombre,
+        "pictograms": [
+            {
+                "id": p.id,
+                "palabra": p.palabra,
+                "parte_de_la_palabra": p.parte_de_la_palabra,
+                "image_url": p.image_url,
+                "category_id": p.category_id
+            } for p in category.pictograms
+        ]
     }
