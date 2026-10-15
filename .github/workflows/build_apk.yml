@@ -26,15 +26,16 @@ jobs:
           flutter-version: '3.19.2'
           channel: 'stable'
 
-      - name: Verificar versión de Flutter
+      - name: Verificar versión de Flutter y Dart
         run: flutter --version
 
-      - name: Instalar dependencias del Frontend
+      - name: Limpiar y obtener dependencias (Pub Get)
         run: |
           cd caa_frontend
+          flutter clean
           flutter pub get
 
-      - name: Compilar APK de Android
+      - name: Compilar APK de Android (Release)
         run: |
           cd caa_frontend
           flutter build apk --release
