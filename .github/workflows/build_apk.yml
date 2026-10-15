@@ -1,0 +1,46 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches: [ "main", "version-offline" ]
+  pull_request:
+    branches: [ "main", "version-offline" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Verificar versión de Flutter y Dart
+        run: flutter --version
+
+      - name: Limpiar y obtener dependencias (Pub Get)
+        run: |
+          cd caa_frontend
+          flutter clean
+          flutter pub get
+
+      - name: Compilar APK de Android (Release)
+        run: |
+          cd caa_frontend
+          flutter build apk --release
+
+      - name: Subir APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: caa_frontend/build/app/outputs/flutter-apk/app-release.apk

@@ -1,0 +1,23 @@
+# --- Reglas para Backend (Python / FastAPI) ---
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.db
+*.sqlite3
+.env
+venv/
+.venv/
+
+# --- Reglas para Frontend (Flutter / Dart) ---
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+
+# --- Reglas de Editores y Sistema ---
+**/.idea/
+**/.vscode/
+.DS_Store
+Thumbs.db
